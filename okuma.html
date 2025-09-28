@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Türkçe Okuma Egzersizi</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+  h1 { margin-bottom: 20px; }
+  .harfler button, .kontrol button {
+    font-size: 2em;
+    padding: 15px 25px;
+    margin: 8px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .harfler button { background:#1976D2; color:white; }
+  .kontrol button#dogru { background:#4CAF50; color:white; }
+  .kontrol button#yanlis { background:#E53935; color:white; }
+  #kelime { font-size: 4em; margin: 40px 0; }
+  #geri { background:#757575; color:white; margin-top:30px; }
+</style>
+</head>
+<body>
+
+<h1>Türkçe Okuma Egzersizi</h1>
+
+<!-- Harf seçme alanı -->
+<div id="harfSecim" class="harfler"></div>
+
+<!-- Egzersiz alanı -->
+<div id="egzersiz" style="display:none;">
+  <div id="kelime"></div>
+  <div class="kontrol">
+    <button id="dogru">✓ Doğru</button>
+    <button id="yanlis">✗ Yanlış</button>
+  </div>
+  <div id="tekrar"></div>
+  <button id="geri">⬅ Harf Seçimine Dön</button>
+</div>
+
+<script>
+// 🔠 Türkçe alfabe (w,q,x yok)
+const alfabe = ["a","b","c","ç","d","e","f","g","ğ","h","ı","i","j","k","l",
+                "m","n","o","ö","p","r","s","ş","t","u","ü","v","y","z"];
+
+// 🟢 Harfe göre kelime listeleri
+// Buraya her harf için uygun hece/kelimeler ekleyebilirsin
+const kelimeListesi = {
+  "a":["ba","al","ta","ama","araba","bal","kala"],
+  "b":["ba","be","bi","bo","bu","bal","baba","bebek"],
+  "c":["ca","ce","ci","cam","cümle"],
+  "ç":["ça","çe","çi","çay","çilek","çorap"],
+  "d":["da","de","di","do","du","dal","dede"],
+  "e":["el","et","ev","etek","elma"],
+  "f":["fa","fe","fi","futbol","fener"],
+  // Diğer harfleri de benzer şekilde çoğaltabilirsin
+};
+
+// ---- Ekran elementleri
+const harfSecimDiv = document.getElementById("harfSecim");
+const egzersizDiv  = document.getElementById("egzersiz");
+const kelimeDiv    = document.getElementById("kelime");
+const tekrarDiv    = document.getElementById("tekrar");
+const geriBtn      = document.getElementById("geri");
+
+let aktifListe = [];
+let index = 0;
+let yanlislar = [];
+let tekrarModu = false;
+
+// 1️⃣ Harf butonlarını oluştur
+alfabe.forEach(harf=>{
+  const btn = document.createElement("button");
+  btn.textContent = harf.toUpperCase();
+  btn.onclick = ()=>baslatEgzersiz(harf);
+  harfSecimDiv.appendChild(btn);
+});
+
+// 2️⃣ Egzersizi başlat
+function baslatEgzersiz(harf){
+  aktifListe = kelimeListesi[harf] || ["Bu harf için liste ekleyin"];
+  index = 0;
+  yanlislar = [];
+  tekrarModu = false;
+  harfSecimDiv.style.display = "none";
+  egzersizDiv.style.display  = "block";
+  gosterKelime();
+}
+
+// 3️⃣ Kelimeyi göster
+function gosterKelime(){
+  if(index < aktifListe.length){
+    kelimeDiv.textContent = aktifListe[index];
+  } else if(!tekrarModu && yanlislar.length>0){
+    tekrarModu = true;
+    aktifListe = yanlislar.slice();
+    yanlislar = [];
+    index = 0;
+    tekrarDiv.textContent = "Şimdi sadece yanlışlar tekrar edilecek!";
+    gosterKelime();
+  } else {
+    kelimeDiv.textContent = "🎉 Egzersiz bitti!";
+    tekrarDiv.textContent = "";
+  }
+}
+
+// 4️⃣ Doğru / Yanlış butonları
+document.getElementById("dogru").onclick = ()=>{
+  index++;
+  gosterKelime();
+};
+document.getElementById("yanlis").onclick = ()=>{
+  yanlislar.push(aktifListe[index]);
+  index++;
+  gosterKelime();
+};
+
+// 5️⃣ Geri dön butonu
+geriBtn.onclick = ()=>{
+  egzersizDiv.style.display  = "none";
+  harfSecimDiv.style.display = "block";
+  tekrarDiv.textContent = "";
+};
+
+</script>
+</body>
+</html>
